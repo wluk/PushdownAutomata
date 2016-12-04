@@ -1,0 +1,30 @@
+﻿<Window x:Class="PushdownAutomata.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PushdownAutomata"
+        mc:Ignorable="d"
+        Title="Automat ze stosem" Height="350" Width="525">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="79*"/>
+            <ColumnDefinition Width="438*"/>
+        </Grid.ColumnDefinitions>
+        <Button x:Name="setting" Content="Konfiguracja" HorizontalAlignment="Left" Height="43" Margin="318.57,10,0,0" VerticalAlignment="Top" Width="109" Grid.Column="1" Click="button_Click"/>
+        <Button x:Name="start" Content="START" HorizontalAlignment="Left" Height="43" Margin="318.57,58,0,0" VerticalAlignment="Top" Width="109" Grid.Column="1" Click="button_Copy_Click"/>
+        <Button x:Name="stop" Content="STOP" HorizontalAlignment="Left" Height="43" Margin="318.57,106,0,0" VerticalAlignment="Top" Width="109" Grid.Column="1" Click="button_Copy1_Click"/>
+        <Button x:Name="close" Content="ZAMKNIJ" HorizontalAlignment="Left" Height="43" Margin="318.57,266,0,0" VerticalAlignment="Top" Width="109" Grid.Column="1" Click="close_Click"/>
+        <ListBox x:Name="listBox" HorizontalAlignment="Left" Margin="234.57,48,0,0" VerticalAlignment="Top" Background="#FFF09191" Grid.Column="1" VerticalContentAlignment="Bottom" TextOptions.TextHintingMode="Animated" Width="40">
+            <ListBox.Effect>
+                <DropShadowEffect/>
+            </ListBox.Effect>
+        </ListBox>
+        <Button x:Name="reset" Content="RESET" HorizontalAlignment="Left" Height="43" Margin="318.57,154,0,0" VerticalAlignment="Top" Width="109" Grid.Column="1" Click="reset_Click"/>
+        <Label x:Name="ProcessingChar" Content="Label" HorizontalAlignment="Left" Height="37" Margin="10,144,0,0" VerticalAlignment="Top" Width="60"/>
+        <Label x:Name="label_Copy2" Content="STOS" HorizontalAlignment="Left" Height="37" Margin="198.57,10,0,0" VerticalAlignment="Top" Width="112" Grid.Column="1"/>
+        <TextBox x:Name="inputText" HorizontalAlignment="Left" Height="25" Margin="10,47,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="229" Grid.ColumnSpan="2" Background="#FFE2BABA" PreviewTextInput="InputValidation"/>
+        <Label x:Name="label_Copy4" Content="Ciąg danych wejściowych" HorizontalAlignment="Left" Height="37" Margin="10,10,0,0" VerticalAlignment="Top" Width="229" Grid.ColumnSpan="2"/>
+
+    </Grid>
+</Window>
