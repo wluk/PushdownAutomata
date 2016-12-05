@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -15,6 +17,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace PushdownAutomata
 {
@@ -32,6 +35,19 @@ namespace PushdownAutomata
         const char AChar = 'a';
         const char BChar = 'b';
         const char EndOfStack = 'F';
+        private static MainWindow _instance = null;
+
+        public static MainWindow Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    _instance = new MainWindow();
+                }
+                return _instance;
+            }
+        }
         public class ConfSet
         {
             //a
@@ -42,6 +58,7 @@ namespace PushdownAutomata
             public char BSame { get; set; }
             public char BOther { get; set; }
             public char BEndStack { get; set; }
+            public int TmieStep { get; set; }
         }
 
         public MainWindow()
@@ -55,9 +72,11 @@ namespace PushdownAutomata
                 BSame = 'a',
                 BOther = 'b',
                 BEndStack = 'F',
+                TmieStep = 1
             };
             Stack.Push(EndOfStack);
             SimulataStack.Add(EndOfStack.ToString());
+            stackGraph.Items.Add(EndOfStack.ToString());
         }
 
         private void button_Copy_Click(object sender, RoutedEventArgs e)
@@ -67,12 +86,6 @@ namespace PushdownAutomata
             Processing();
             //STATR
             //
-
-            SimulataStack.Reverse();
-            foreach (var item in SimulataStack)
-            {
-                listBox.Items.Add(item);
-            }
         }
 
         private void button_Click(object sender, RoutedEventArgs e)
@@ -106,6 +119,16 @@ namespace PushdownAutomata
                 var word = xyz.First();
                 xyz.Remove(xyz.First());
 
+                ProcessingChar.Inlines.Clear();
+                ProcessingChar.Inlines.Add(new Run("Odczytano -> " + word));
+                ProcessingChar.Inlines.Add(new LineBreak());
+                ProcessingChar.Inlines.Add(new Run("operacja"));
+                ProcessingChar.Inlines.Add(new LineBreak());
+                ProcessingChar.Inlines.Add(new Run("na górze stosu " + SimulataStack.Last().ToString()));
+
+
+
+
                 switch (word[0])
                 {
                     case AChar: SelectOperationForA(SimulataStack.First()[0]); break;
@@ -114,23 +137,27 @@ namespace PushdownAutomata
                         break;
                 }
 
-                Application.Current.Dispatcher.BeginInvoke(
-                    System.Windows.Threading.DispatcherPriority.Normal,
-                    new Action(() => this.ProcessingChar.Content = word)
-                    );
 
-                Thread.Sleep(10000);
-                listBox.Items.Clear();
+                stackGraph.Items.Clear();
                 foreach (var item in SimulataStack)
                 {
-                    listBox.Items.Add(item);
+                    stackGraph.Items.Add(item);
                 }
+                Upd();
+                Thread.Sleep(Settings.TmieStep * 1000);
                 Processing();
             }
             else
             {
 
             }
+        }
+        private static Action EmptyDelegate = delegate () { };
+        private void Upd()
+        {
+
+            stackGraph.Dispatcher.Invoke(DispatcherPriority.Input, EmptyDelegate);
+            ProcessingChar.Dispatcher.Invoke(DispatcherPriority.Input, EmptyDelegate);
         }
 
         private void SelectOperationForA(char onTopStack)
@@ -175,8 +202,6 @@ namespace PushdownAutomata
                 default:
                     break;
             }
-
-
         }
 
         private void close_Click(object sender, RoutedEventArgs e)

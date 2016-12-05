@@ -31,6 +31,8 @@
         <Label x:Name="label2" Content="F - flaga końca stosu" HorizontalAlignment="Left" Margin="10,221,0,0" VerticalAlignment="Top"/>
         <Label x:Name="label3" Content="Uzupełnij deklarację operacji" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Top"/>
         <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="10,252,0,-3" TextWrapping="Wrap" Text="Możliwe operacje:   a - dodaj do stosu a b - dodaj do stosu b 1 - zdejmij ze stosu" VerticalAlignment="Top" Width="110"/>
+        <Label x:Name="label_Copy4" Content="Czas przejścia [s]" Margin="207,226,25,81" HorizontalAlignment="Center" HorizontalContentAlignment="Stretch"/>
+        <TextBox x:Name="TimeStep" TextWrapping="Wrap" Text="{Binding Path=TmieStep}"   MaxLength="2" Margin="207,255,25,55"/>
 
     </Grid>
 </Window>
