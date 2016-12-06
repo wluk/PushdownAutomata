@@ -38,6 +38,7 @@ namespace PushdownAutomata
         const char EndOfStack = 'F';
         private static MainWindow _instance = null;
         public int Step { get; set; }
+        public int ProgressValue { get; set; }
 
         public static MainWindow Instance
         {
@@ -85,8 +86,11 @@ namespace PushdownAutomata
         private void button_Copy_Click(object sender, RoutedEventArgs e)
         {
             //start
+            Progress.Value = 0;
+            Progress.Maximum = inputText.Text.Length;
             xyz = inputText.Text.Select(c => c.ToString()).ToList();
             Processing();
+            
             //STATR
             //
         }
@@ -140,6 +144,8 @@ namespace PushdownAutomata
                 {
                     stackGraph.Items.Add(item);
                 }
+                //http://www.wpf-tutorial.com/misc-controls/the-progressbar-control/
+                Progress.Value++;
                 Upd();
                 Thread.Sleep(Settings.TmieStep * 1000);
                 Processing();
@@ -155,6 +161,7 @@ namespace PushdownAutomata
 
             stackGraph.Dispatcher.Invoke(DispatcherPriority.Input, EmptyDelegate);
             ProcessingChar.Dispatcher.Invoke(DispatcherPriority.Input, EmptyDelegate);
+            Progress.Dispatcher.Invoke(DispatcherPriority.Input, EmptyDelegate);
         }
 
         private void SelectOperationForA(char onTopStack)
