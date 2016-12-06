@@ -14,12 +14,13 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using static PushdownAutomata.MainWindow;
 
+
 namespace PushdownAutomata
 {
     /// <summary>
     /// Interaction logic for Configuration.xaml
     /// </summary>
-    public partial class Configuration : Window
+    public partial class Configuration : MahApps.Metro.Controls.MetroWindow
     {
         public Configuration()
         {

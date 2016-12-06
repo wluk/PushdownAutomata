@@ -18,13 +18,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using MahApps.Metro.Controls;
 
 namespace PushdownAutomata
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : MetroWindow
     {
         Configuration ConfWindow;
         Stack Stack = new Stack();
@@ -36,6 +37,7 @@ namespace PushdownAutomata
         const char BChar = 'b';
         const char EndOfStack = 'F';
         private static MainWindow _instance = null;
+        public int Step { get; set; }
 
         public static MainWindow Instance
         {
@@ -74,6 +76,7 @@ namespace PushdownAutomata
                 BEndStack = 'F',
                 TmieStep = 1
             };
+            Step = 0;
             Stack.Push(EndOfStack);
             SimulataStack.Add(EndOfStack.ToString());
             stackGraph.Items.Add(EndOfStack.ToString());
@@ -92,11 +95,6 @@ namespace PushdownAutomata
         {
             ConfWindow = new Configuration();
             ConfWindow.Show(Settings);
-        }
-
-        private void button_Copy1_Click(object sender, RoutedEventArgs e)
-        {
-
         }
 
         private void InputValidation(object sender, TextCompositionEventArgs e)
@@ -118,13 +116,12 @@ namespace PushdownAutomata
             {
                 var word = xyz.First();
                 xyz.Remove(xyz.First());
+                Step++;
 
                 ProcessingChar.Inlines.Clear();
-                ProcessingChar.Inlines.Add(new Run("Odczytano -> " + word));
+                ProcessingChar.Inlines.Add(new Run("Odczytano -> " + word + " znak numer: " + Step + " z " + inputText.Text.Length));
                 ProcessingChar.Inlines.Add(new LineBreak());
-                ProcessingChar.Inlines.Add(new Run("operacja"));
-                ProcessingChar.Inlines.Add(new LineBreak());
-                ProcessingChar.Inlines.Add(new Run("na górze stosu " + SimulataStack.Last().ToString()));
+                ProcessingChar.Inlines.Add(new Run("na górze stosu " + SimulataStack.First().ToString()));
 
 
 
@@ -172,6 +169,9 @@ namespace PushdownAutomata
                     break;
             }
 
+            ProcessingChar.Inlines.Add(new LineBreak());
+            ProcessingChar.Inlines.Add(new Run("operacja -> " + result));
+
             switch (result)
             {
                 case AChar: SimulataStack.Insert(0, AChar.ToString()); break;
@@ -213,6 +213,23 @@ namespace PushdownAutomata
         {
             System.Diagnostics.Process.Start(Application.ResourceAssembly.Location);
             Application.Current.Shutdown();
+        }
+
+        private void inputText_TextInput(object sender, TextCompositionEventArgs e)
+        {
+
+        }
+
+        private void inputText_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (((TextBox)e.Source).Text.Length != 0)
+            {
+                start.IsEnabled = true;
+            }
+            else
+            {
+                start.IsEnabled = false;
+            }
         }
     }
 }
