@@ -31,7 +31,6 @@ namespace PushdownAutomata
         Stack Stack = new Stack();
         List<string> SimulataStack = new List<string>();
         List<string> xyz = new List<string>();
-        char[] Input;
         ConfSet Settings;
         const char AChar = 'a';
         const char BChar = 'b';
@@ -75,22 +74,21 @@ namespace PushdownAutomata
                 BSame = 'a',
                 BOther = 'b',
                 BEndStack = 'F',
-                TmieStep = 1
+                TmieStep = 5
             };
             Step = 0;
             Stack.Push(EndOfStack);
             SimulataStack.Add(EndOfStack.ToString());
-            stackGraph.Items.Add(EndOfStack.ToString());
+            stackGraph.Text += EndOfStack.ToString();
         }
 
         private void button_Copy_Click(object sender, RoutedEventArgs e)
         {
             //start
             Progress.Value = 0;
-            Progress.Maximum = inputText.Text.Length;
             xyz = inputText.Text.Select(c => c.ToString()).ToList();
             Processing();
-            
+
             //STATR
             //
         }
@@ -139,15 +137,15 @@ namespace PushdownAutomata
                 }
 
 
-                stackGraph.Items.Clear();
+                stackGraph.Text = string.Empty;
                 foreach (var item in SimulataStack)
                 {
-                    stackGraph.Items.Add(item);
+                    stackGraph.Text += item.ToString() + "\n";
                 }
                 //http://www.wpf-tutorial.com/misc-controls/the-progressbar-control/
-                Progress.Value++;
+                ProgressBarUpdate();
                 Upd();
-                Thread.Sleep(Settings.TmieStep * 1000);
+                //Thread.Sleep(Settings.TmieStep * 1000);
                 Processing();
             }
             else
@@ -155,13 +153,26 @@ namespace PushdownAutomata
 
             }
         }
+
+        private void ProgressBarUpdate()
+        {
+            for (int i = 0; i < Progress.Maximum / inputText.Text.Length; i++)
+            {
+                Progress.Value++;
+                Progress.Dispatcher.Invoke(DispatcherPriority.Input, EmptyDelegate);
+                if (i%2==0)
+                {
+                    Thread.Sleep(Settings.TmieStep*10);
+                }
+            }
+        }
+
+
         private static Action EmptyDelegate = delegate () { };
         private void Upd()
         {
-
             stackGraph.Dispatcher.Invoke(DispatcherPriority.Input, EmptyDelegate);
-            ProcessingChar.Dispatcher.Invoke(DispatcherPriority.Input, EmptyDelegate);
-            Progress.Dispatcher.Invoke(DispatcherPriority.Input, EmptyDelegate);
+            ProcessingChar.Dispatcher.Invoke(DispatcherPriority.Input, EmptyDelegate);            
         }
 
         private void SelectOperationForA(char onTopStack)

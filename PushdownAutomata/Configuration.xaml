@@ -57,7 +57,7 @@
                 <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="0,0,0,0" TextWrapping="Wrap" Text="Możliwe operacje:   a - dodaj do stosu a b - dodaj do stosu b 1 - zdejmij ze stosu" VerticalAlignment="Top" Width="111"/>
             </StackPanel>
             <StackPanel Grid.Column="1" Grid.Row="2" Margin="10,0,6,0">
-                <Label x:Name="label_Copy4" Content="Czas przejścia [s]:" Margin="0,0,0,0" HorizontalAlignment="Left" HorizontalContentAlignment="Stretch" Width="120"/>
+                <Label x:Name="label_Copy4" Content="Czas przejścia [x10ms]:" Margin="0,0,0,0" HorizontalAlignment="Left" HorizontalContentAlignment="Stretch" Width="146"/>
                 <TextBox x:Name="TimeStep" TextWrapping="Wrap" Text="{Binding Path=TmieStep}"   MaxLength="2" Margin="0,0,0,0"/>
             </StackPanel>
             <Button x:Name="CloseConf" Content="Zapisz i zamknij" HorizontalAlignment="Right" Height="32" Margin="0,0,6,0" VerticalAlignment="Bottom" Width="auto" Click="button_Click" Grid.Column="1" Grid.Row="3"/>
