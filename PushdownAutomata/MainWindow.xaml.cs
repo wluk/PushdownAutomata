@@ -28,7 +28,6 @@ namespace PushdownAutomata
     public partial class MainWindow : MetroWindow
     {
         Configuration ConfWindow;
-        Stack Stack = new Stack();
         List<string> SimulataStack = new List<string>();
         List<string> xyz = new List<string>();
         ConfSet Settings;
@@ -75,22 +74,19 @@ namespace PushdownAutomata
                 BOther = 'b',
                 BEndStack = 'F',
                 TmieStep = 5
-            };
-            Step = 0;
-            Stack.Push(EndOfStack);
-            SimulataStack.Add(EndOfStack.ToString());
+            };            
             stackGraph.Text += EndOfStack.ToString();
         }
 
         private void button_Copy_Click(object sender, RoutedEventArgs e)
         {
-            //start
+            stackGraph.Text = string.Empty;
+            SimulataStack.Clear();
+            SimulataStack.Add(EndOfStack.ToString());
             Progress.Value = 0;
+            Step = 0;
             xyz = inputText.Text.Select(c => c.ToString()).ToList();
             Processing();
-
-            //STATR
-            //
         }
 
         private void button_Click(object sender, RoutedEventArgs e)
