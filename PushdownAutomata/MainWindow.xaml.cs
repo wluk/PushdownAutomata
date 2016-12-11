@@ -34,6 +34,7 @@ namespace PushdownAutomata
         const char AChar = 'a';
         const char BChar = 'b';
         const char EndOfStack = 'F';
+        const char PopStack = '1';
         private static MainWindow _instance = null;
         public int Step { get; set; }
         public int ProgressValue { get; set; }
@@ -68,14 +69,32 @@ namespace PushdownAutomata
             Settings = new ConfSet()
             {
                 ASame = 'a',
-                AOther = 'b',
-                AEndStack = 'F',
-                BSame = 'a',
-                BOther = 'b',
-                BEndStack = 'F',
-                TmieStep = 5
-            };            
+                AOther = '1',
+                AEndStack = 'a',
+                BSame = 'b',
+                BOther = '1',
+                BEndStack = 'b',
+                TmieStep = 10
+            };
             stackGraph.Text += EndOfStack.ToString();
+
+            loadGraph();
+        }
+
+        private void loadGraph()
+        {
+            BitmapImage src = new BitmapImage();
+            src.BeginInit();
+            src.UriSource = new Uri("graf.jpg", UriKind.RelativeOrAbsolute);
+            src.CacheOption = BitmapCacheOption.OnLoad;
+            src.EndInit();
+            image.Source = src;
+            image.Stretch = Stretch.Uniform;
+            FinishState.Visibility = Visibility.Hidden;
+            Foperration.Visibility = Visibility.Hidden;
+            ChangeState.Visibility = Visibility.Hidden;
+            StartState.Visibility = Visibility.Visible;
+
         }
 
         private void button_Copy_Click(object sender, RoutedEventArgs e)
@@ -86,6 +105,13 @@ namespace PushdownAutomata
             Progress.Value = 0;
             Step = 0;
             xyz = inputText.Text.Select(c => c.ToString()).ToList();
+            Aoperation.Visibility = Visibility.Hidden;
+            Boperation.Visibility = Visibility.Hidden;
+            FinishState.Visibility = Visibility.Hidden;
+            Foperration.Visibility = Visibility.Hidden;
+            ChangeState.Visibility = Visibility.Visible;
+            StartState.Visibility = Visibility.Hidden;
+
             Processing();
         }
 
@@ -116,14 +142,6 @@ namespace PushdownAutomata
                 xyz.Remove(xyz.First());
                 Step++;
 
-                ProcessingChar.Inlines.Clear();
-                ProcessingChar.Inlines.Add(new Run("Odczytano -> " + word + " znak numer: " + Step + " z " + inputText.Text.Length));
-                ProcessingChar.Inlines.Add(new LineBreak());
-                ProcessingChar.Inlines.Add(new Run("na górze stosu " + SimulataStack.First().ToString()));
-
-
-
-
                 switch (word[0])
                 {
                     case AChar: SelectOperationForA(SimulataStack.First()[0]); break;
@@ -132,21 +150,31 @@ namespace PushdownAutomata
                         break;
                 }
 
-
                 stackGraph.Text = string.Empty;
                 foreach (var item in SimulataStack)
                 {
                     stackGraph.Text += item.ToString() + "\n";
                 }
-                //http://www.wpf-tutorial.com/misc-controls/the-progressbar-control/
                 ProgressBarUpdate();
                 Upd();
                 //Thread.Sleep(Settings.TmieStep * 1000);
                 Processing();
             }
+            else if (SimulataStack.Count == 0)
+            {
+                Aoperation.Visibility = Visibility.Hidden;
+                Boperation.Visibility = Visibility.Hidden;
+                FinishState.Visibility = Visibility.Visible;
+                Foperration.Visibility = Visibility.Visible;
+                ChangeState.Visibility = Visibility.Hidden;
+            }
             else
             {
-
+                Aoperation.Visibility = Visibility.Hidden;
+                Boperation.Visibility = Visibility.Hidden;
+                FinishState.Visibility = Visibility.Visible;
+                Foperration.Visibility = Visibility.Hidden;
+                ChangeState.Visibility = Visibility.Hidden;
             }
         }
 
@@ -156,19 +184,19 @@ namespace PushdownAutomata
             {
                 Progress.Value++;
                 Progress.Dispatcher.Invoke(DispatcherPriority.Input, EmptyDelegate);
-                if (i%2==0)
+                if (i % 2 == 0)
                 {
-                    Thread.Sleep(Settings.TmieStep*10);
+                    Thread.Sleep(Settings.TmieStep * 10);
                 }
             }
         }
-
 
         private static Action EmptyDelegate = delegate () { };
         private void Upd()
         {
             stackGraph.Dispatcher.Invoke(DispatcherPriority.Input, EmptyDelegate);
-            ProcessingChar.Dispatcher.Invoke(DispatcherPriority.Input, EmptyDelegate);            
+            Aoperation.Dispatcher.Invoke(DispatcherPriority.Input, EmptyDelegate);
+            Boperation.Dispatcher.Invoke(DispatcherPriority.Input, EmptyDelegate);
         }
 
         private void SelectOperationForA(char onTopStack)
@@ -183,14 +211,26 @@ namespace PushdownAutomata
                     break;
             }
 
-            ProcessingChar.Inlines.Add(new LineBreak());
-            ProcessingChar.Inlines.Add(new Run("operacja -> " + result));
+            Boperation.Visibility = Visibility.Hidden;
+            Aoperation.Visibility = Visibility.Visible;
+            Aoperation.Content = SimulataStack.First().ToString() + "/" + result.ToString();
 
-            switch (result)
+            Operation(result);
+        }
+
+        private void Operation(char symbol)
+        {
+            switch (symbol)
             {
-                case AChar: SimulataStack.Insert(0, AChar.ToString()); break;
-                case BChar: SimulataStack.Remove(SimulataStack.First()); break;
-                case EndOfStack: SimulataStack.Insert(0, AChar.ToString()); break;
+                case AChar:
+                    SimulataStack.Insert(0, AChar.ToString());
+                    break;
+                case BChar:
+                    SimulataStack.Insert(0, BChar.ToString());
+                    break;
+                case PopStack:
+                    SimulataStack.Remove(SimulataStack.First());
+                    break;
                 default:
                     break;
             }
@@ -208,14 +248,12 @@ namespace PushdownAutomata
                     break;
             }
 
-            switch (result)
-            {
-                case AChar: SimulataStack.Insert(0, AChar.ToString()); break;
-                case BChar: SimulataStack.Remove(SimulataStack.First()); break;
-                case EndOfStack: SimulataStack.Insert(0, AChar.ToString()); break;
-                default:
-                    break;
-            }
+            Aoperation.Visibility = Visibility.Hidden;
+            Boperation.Visibility = Visibility.Visible;
+            Boperation.Content = SimulataStack.First().ToString() + "/" + result.ToString();
+
+            Operation(result);
+
         }
 
         private void close_Click(object sender, RoutedEventArgs e)
