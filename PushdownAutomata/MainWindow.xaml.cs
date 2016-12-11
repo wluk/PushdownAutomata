@@ -28,60 +28,24 @@ namespace PushdownAutomata
     public partial class MainWindow : MetroWindow
     {
         Configuration ConfWindow;
-        List<string> SimulataStack = new List<string>();
-        List<string> xyz = new List<string>();
-        ConfSet Settings;
-        const char AChar = 'a';
-        const char BChar = 'b';
-        const char EndOfStack = 'F';
-        const char PopStack = '1';
-        private static MainWindow _instance = null;
-        public int Step { get; set; }
-        public int ProgressValue { get; set; }
+        public ConfSet Settings;
+        Service PushdownAutomat;
 
-        public static MainWindow Instance
-        {
-            get
-            {
-                if (_instance == null)
-                {
-                    _instance = new MainWindow();
-                }
-                return _instance;
-            }
-        }
-        public class ConfSet
-        {
-            //a
-            public char ASame { get; set; }
-            public char AOther { get; set; }
-            public char AEndStack { get; set; }
-            //b
-            public char BSame { get; set; }
-            public char BOther { get; set; }
-            public char BEndStack { get; set; }
-            public int TmieStep { get; set; }
-        }
+        public int ProgressValue { get; set; }
 
         public MainWindow()
         {
             InitializeComponent();
-            Settings = new ConfSet()
-            {
-                ASame = 'a',
-                AOther = '1',
-                AEndStack = 'a',
-                BSame = 'b',
-                BOther = '1',
-                BEndStack = 'b',
-                TmieStep = 10
-            };
-            stackGraph.Text += EndOfStack.ToString();
 
-            loadGraph();
+            Settings = new ConfSet('a', '1', 'a', 'b', '1', 'b', 10);
+            PushdownAutomat = new Service(this);
+
+            stackGraph.Text = "F";
+
+            LoadGraph();
         }
 
-        private void loadGraph()
+        private void LoadGraph()
         {
             BitmapImage src = new BitmapImage();
             src.BeginInit();
@@ -90,21 +54,26 @@ namespace PushdownAutomata
             src.EndInit();
             image.Source = src;
             image.Stretch = Stretch.Uniform;
+
             FinishState.Visibility = Visibility.Hidden;
             Foperration.Visibility = Visibility.Hidden;
             ChangeState.Visibility = Visibility.Hidden;
-            StartState.Visibility = Visibility.Visible;
 
+            StartState.Visibility = Visibility.Visible;
         }
 
-        private void button_Copy_Click(object sender, RoutedEventArgs e)
+        private void btnStart_Click(object sender, RoutedEventArgs e)
         {
             stackGraph.Text = string.Empty;
-            SimulataStack.Clear();
-            SimulataStack.Add(EndOfStack.ToString());
+            PushdownAutomat.Stack.Clear();
+            PushdownAutomat.Stack.Add("F");
+            stackGraph.Text = "F";
+            RefreshControls();
             Progress.Value = 0;
-            Step = 0;
-            xyz = inputText.Text.Select(c => c.ToString()).ToList();
+            PushdownAutomat.Step = 0;
+
+            PushdownAutomat.Input = inputText.Text.Select(c => c.ToString()).ToList();
+
             Aoperation.Visibility = Visibility.Hidden;
             Boperation.Visibility = Visibility.Hidden;
             FinishState.Visibility = Visibility.Hidden;
@@ -112,10 +81,10 @@ namespace PushdownAutomata
             ChangeState.Visibility = Visibility.Visible;
             StartState.Visibility = Visibility.Hidden;
 
-            Processing();
+            PushdownAutomat.Processing();
         }
 
-        private void button_Click(object sender, RoutedEventArgs e)
+        private void btnSetting_Click(object sender, RoutedEventArgs e)
         {
             ConfWindow = new Configuration();
             ConfWindow.Show(Settings);
@@ -128,57 +97,7 @@ namespace PushdownAutomata
             e.Handled = !regex.IsMatch(e.Text);
         }
 
-        private void InputCharValidation(object sender, TextCompositionEventArgs e)
-        {
-            Regex regex = new Regex(".");
-            e.Handled = !regex.IsMatch(e.Text);
-        }
-
-        private void Processing()
-        {
-            if (SimulataStack.Count >= 1 && xyz.Count > 0)
-            {
-                var word = xyz.First();
-                xyz.Remove(xyz.First());
-                Step++;
-
-                switch (word[0])
-                {
-                    case AChar: SelectOperationForA(SimulataStack.First()[0]); break;
-                    case BChar: SelectOperationForB(SimulataStack.First()[0]); break;
-                    default:
-                        break;
-                }
-
-                stackGraph.Text = string.Empty;
-                foreach (var item in SimulataStack)
-                {
-                    stackGraph.Text += item.ToString() + "\n";
-                }
-                ProgressBarUpdate();
-                Upd();
-                //Thread.Sleep(Settings.TmieStep * 1000);
-                Processing();
-            }
-            else if (SimulataStack.Count == 0)
-            {
-                Aoperation.Visibility = Visibility.Hidden;
-                Boperation.Visibility = Visibility.Hidden;
-                FinishState.Visibility = Visibility.Visible;
-                Foperration.Visibility = Visibility.Visible;
-                ChangeState.Visibility = Visibility.Hidden;
-            }
-            else
-            {
-                Aoperation.Visibility = Visibility.Hidden;
-                Boperation.Visibility = Visibility.Hidden;
-                FinishState.Visibility = Visibility.Visible;
-                Foperration.Visibility = Visibility.Hidden;
-                ChangeState.Visibility = Visibility.Hidden;
-            }
-        }
-
-        private void ProgressBarUpdate()
+        public void ProgressBarUpdate()
         {
             for (int i = 0; i < Progress.Maximum / inputText.Text.Length; i++)
             {
@@ -192,87 +111,19 @@ namespace PushdownAutomata
         }
 
         private static Action EmptyDelegate = delegate () { };
-        private void Upd()
+        public void RefreshControls()
         {
             stackGraph.Dispatcher.Invoke(DispatcherPriority.Input, EmptyDelegate);
             Aoperation.Dispatcher.Invoke(DispatcherPriority.Input, EmptyDelegate);
             Boperation.Dispatcher.Invoke(DispatcherPriority.Input, EmptyDelegate);
         }
 
-        private void SelectOperationForA(char onTopStack)
-        {
-            char result = new char();
-            switch (onTopStack)
-            {
-                case AChar: result = Settings.ASame; break;
-                case BChar: result = Settings.AOther; break;
-                case EndOfStack: result = Settings.AEndStack; break;
-                default:
-                    break;
-            }
-
-            Boperation.Visibility = Visibility.Hidden;
-            Aoperation.Visibility = Visibility.Visible;
-            Aoperation.Content = SimulataStack.First().ToString() + "/" + result.ToString();
-
-            Operation(result);
-        }
-
-        private void Operation(char symbol)
-        {
-            switch (symbol)
-            {
-                case AChar:
-                    SimulataStack.Insert(0, AChar.ToString());
-                    break;
-                case BChar:
-                    SimulataStack.Insert(0, BChar.ToString());
-                    break;
-                case PopStack:
-                    SimulataStack.Remove(SimulataStack.First());
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        private void SelectOperationForB(char onTopStack)
-        {
-            char result = new char();
-            switch (onTopStack)
-            {
-                case AChar: result = Settings.BOther; break;
-                case BChar: result = Settings.BSame; break;
-                case EndOfStack: result = Settings.BEndStack; break;
-                default:
-                    break;
-            }
-
-            Aoperation.Visibility = Visibility.Hidden;
-            Boperation.Visibility = Visibility.Visible;
-            Boperation.Content = SimulataStack.First().ToString() + "/" + result.ToString();
-
-            Operation(result);
-
-        }
-
-        private void close_Click(object sender, RoutedEventArgs e)
+        private void btnClose_Click(object sender, RoutedEventArgs e)
         {
             Close();
         }
 
-        private void reset_Click(object sender, RoutedEventArgs e)
-        {
-            System.Diagnostics.Process.Start(Application.ResourceAssembly.Location);
-            Application.Current.Shutdown();
-        }
-
-        private void inputText_TextInput(object sender, TextCompositionEventArgs e)
-        {
-
-        }
-
-        private void inputText_TextChanged(object sender, TextChangedEventArgs e)
+        private void btnStartEnable_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (((TextBox)e.Source).Text.Length != 0)
             {
